@@ -191,5 +191,17 @@ class PaginatedResponse(BaseModel):
     total_pages: int
 
 
+class BookListResponse(PaginatedResponse):
+    """Paginated response for books."""
+    items: List[BookResponse]
+
+
+class ReviewListResponse(PaginatedResponse):
+    """Paginated response for reviews."""
+    items: List[ReviewResponse]
+
+
+
+
 # Update forward references
 BookDetailResponse.model_rebuild()

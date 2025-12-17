@@ -84,6 +84,8 @@ class Book(Base):
     @property
     def average_rating(self) -> Optional[float]:
         """Calculate average rating from reviews."""
+        if 'reviews' not in self.__dict__:
+            return None
         if not self.reviews:
             return None
         total = sum(review.rating for review in self.reviews)

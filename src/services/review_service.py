@@ -9,6 +9,7 @@ import logging
 from typing import Optional, List
 from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy import select, func
+from sqlalchemy.orm import selectinload
 
 from src.models import Review
 from src.schemas import ReviewCreate, ReviewUpdate
@@ -44,7 +45,11 @@ class ReviewService:
 
         session.add(review)
         await session.commit()
-        await session.refresh(review)
+        await session.commit()
+        # Eagerly load the user relationship for the response
+        stmt = select(Review).options(selectinload(Review.user)).where(Review.id == review.id)
+        result = await session.execute(stmt)
+        review = result.scalar_one()
 
         logger.info(f"Review created for book {book_id} by user {user_id}")
         return review
@@ -61,7 +66,7 @@ class ReviewService:
         Returns:
             Review instance or None
         """
-        stmt = select(Review).where(Review.id == review_id)
+        stmt = select(Review).options(selectinload(Review.user)).where(Review.id == review_id)
         result = await session.execute(stmt)
         return result.scalar_one_or_none()
 
@@ -90,7 +95,7 @@ class ReviewService:
         total = count_result.scalar() or 0
 
         # Get paginated results
-        stmt = select(Review).where(Review.book_id == book_id).offset(skip).limit(limit)
+        stmt = select(Review).options(selectinload(Review.user)).where(Review.book_id == book_id).offset(skip).limit(limit)
         result = await session.execute(stmt)
         reviews = result.scalars().all()
 
@@ -152,7 +157,11 @@ class ReviewService:
             setattr(review, key, value)
 
         await session.commit()
-        await session.refresh(review)
+        await session.commit()
+        # Eagerly load user for response
+        stmt = select(Review).options(selectinload(Review.user)).where(Review.id == review.id)
+        result = await session.execute(stmt)
+        review = result.scalar_one()
 
         logger.info(f"Review updated: {review_id}")
         return review

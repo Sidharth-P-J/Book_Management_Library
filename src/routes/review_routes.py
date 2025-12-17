@@ -10,7 +10,7 @@ from fastapi import APIRouter, Depends, HTTPException, status, Query
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from src.core import get_db
-from src.schemas import ReviewCreate, ReviewUpdate, ReviewResponse, ReviewSummaryResponse
+from src.schemas import ReviewCreate, ReviewUpdate, ReviewResponse, ReviewSummaryResponse, ReviewListResponse
 from src.services import ReviewService, BookService
 from src.utils import llm_service
 from src.auth import get_current_user, get_current_user_id
@@ -66,7 +66,7 @@ async def create_review(
         ) from e
 
 
-@router.get("/{book_id}/reviews", response_model=dict)
+@router.get("/{book_id}/reviews", response_model=ReviewListResponse)
 async def get_book_reviews(
     book_id: int,
     session: AsyncSession = Depends(get_db),

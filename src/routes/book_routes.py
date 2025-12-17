@@ -11,7 +11,7 @@ from fastapi import APIRouter, Depends, HTTPException, status, Query
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from src.core import get_db
-from src.schemas import BookCreate, BookUpdate, BookResponse, BookDetailResponse
+from src.schemas import BookCreate, BookUpdate, BookResponse, BookDetailResponse, BookListResponse
 from src.services import BookService
 from src.auth import get_current_user
 
@@ -48,7 +48,7 @@ async def create_book(
         ) from e
 
 
-@router.get("", response_model=dict)
+@router.get("", response_model=BookListResponse)
 async def get_books(
     session: AsyncSession = Depends(get_db),
     skip: int = Query(0, ge=0),
@@ -182,7 +182,7 @@ async def delete_book(
     logger.info(f"Book deleted by user {current_user.get('sub')}: {book_id}")
 
 
-@router.get("/search/{query}", response_model=dict)
+@router.get("/search/{query}", response_model=BookListResponse)
 async def search_books(
     query: str,
     session: AsyncSession = Depends(get_db),

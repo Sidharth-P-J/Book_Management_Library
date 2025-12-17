@@ -9,6 +9,7 @@ import logging
 from typing import Optional, List
 from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy import select, func
+from sqlalchemy.orm import selectinload
 
 from src.models import Book
 from src.schemas import BookCreate, BookUpdate
@@ -58,7 +59,7 @@ class BookService:
         Returns:
             Book instance or None
         """
-        stmt = select(Book).where(Book.id == book_id)
+        stmt = select(Book).options(selectinload(Book.reviews)).where(Book.id == book_id)
         result = await session.execute(stmt)
         return result.scalar_one_or_none()
 
@@ -92,7 +93,7 @@ class BookService:
             query = query.where(Book.author.ilike(f"%{author}%"))
 
         # Get total count
-        count_query = query.with_entities(func.count(Book.id))
+        count_query = select(func.count()).select_from(query.subquery())
         count_result = await session.execute(count_query)
         total = count_result.scalar() or 0
 
@@ -179,7 +180,7 @@ class BookService:
         )
 
         # Get total count
-        count_query = search_query.with_entities(func.count(Book.id))
+        count_query = select(func.count()).select_from(search_query.subquery())
         count_result = await session.execute(count_query)
         total = count_result.scalar() or 0
 

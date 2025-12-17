@@ -10,12 +10,12 @@ from typing import Optional, Tuple
 from jose import JWTError, jwt
 from passlib.context import CryptContext
 from fastapi import Depends, HTTPException, status
-from fastapi.security import HTTPBearer, HTTPAuthCredentials
+from fastapi.security import HTTPBearer, HTTPAuthorizationCredentials
 
 from src.core.config import settings
 
 # Password hashing context
-pwd_context = CryptContext(schemes=["bcrypt"], deprecated="auto")
+pwd_context = CryptContext(schemes=["bcrypt"], deprecated="auto", bcrypt__truncate_error=False)
 
 # HTTP Bearer security scheme
 security = HTTPBearer()
@@ -118,7 +118,7 @@ def verify_token(token: str) -> dict:
         ) from e
 
 
-def get_current_user(credentials: HTTPAuthCredentials = Depends(security)) -> dict:
+def get_current_user(credentials: HTTPAuthorizationCredentials = Depends(security)) -> dict:
     """
     Dependency for getting current authenticated user.
 

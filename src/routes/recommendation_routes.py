@@ -11,7 +11,7 @@ from sqlalchemy.ext.asyncio import AsyncSession
 from datetime import datetime
 
 from src.core import get_db
-from src.schemas import SummaryGenerateRequest, SummaryResponse, RecommendationRequest, RecommendationResponse
+from src.schemas import SummaryGenerateRequest, SummaryResponse, RecommendationRequest, RecommendationResponse, BookResponse
 from src.services import RecommendationService
 from src.utils import llm_service
 from src.auth import get_current_user
@@ -143,7 +143,7 @@ async def get_recommendations_by_genre(
         logger.info(f"Genre recommendations generated for user {current_user.get('sub')}: {genre}")
         return {
             "genre": genre,
-            "recommendations": recommendations,
+        "recommendations": [BookResponse.model_validate(b) for b in recommendations],
             "count": len(recommendations),
             "generated_at": datetime.utcnow(),
         }
@@ -180,7 +180,7 @@ async def get_popular_books(
         logger.info(f"Popular book recommendations generated for user {current_user.get('sub')}")
         return {
             "criteria": "Popular books (highest rated with multiple reviews)",
-            "recommendations": recommendations,
+            "recommendations": [BookResponse.model_validate(b) for b in recommendations],
             "count": len(recommendations),
             "generated_at": datetime.utcnow(),
         }
@@ -231,7 +231,7 @@ async def get_similar_books(
         return {
             "reference_book": book.title,
             "criteria": f"Similar to '{book.title}' (same genre: {book.genre})",
-            "recommendations": recommendations,
+            "recommendations": [BookResponse.model_validate(b) for b in recommendations],
             "count": len(recommendations),
             "generated_at": datetime.utcnow(),
         }
