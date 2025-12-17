@@ -159,7 +159,7 @@ async def test_endpoints_require_auth(test_client: AsyncClient):
     ]
 
     for endpoint in endpoints:
-        if endpoint == "/ai/generate-summary":
+        if endpoint in ["/ai/generate-summary", "/ai/recommendations"]:
             response = await test_client.post(endpoint, json={})
         else:
             response = await test_client.get(endpoint)
