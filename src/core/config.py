@@ -29,46 +29,20 @@ class Settings(BaseSettings):
     debug: bool = Field(default=False, description="Debug mode")
 
     # Database Configuration
-    database_url: str = Field(
-        default="postgresql+asyncpg://postgres:postgres@localhost:5432/book_management",
-        description="Async PostgreSQL database URL"
-    )
-    database_sync_url: str = Field(
-        default="postgresql://postgres:postgres@localhost:5432/book_management",
-        description="Synchronous PostgreSQL database URL for Alembic migrations"
-    )
-    database_echo: bool = Field(default=False,
-                               description="Log SQL queries")
+    database_url: str = Field(..., description="Async PostgreSQL database URL")
+    database_sync_url: str = Field(..., description="Synchronous PostgreSQL database URL for Alembic migrations")
+    database_echo: bool = Field(default=False, description="Log SQL queries")
 
     # JWT Configuration
-    secret_key: str = Field(
-        default="your-secret-key-change-in-production-min-32-chars",
-        description="Secret key for JWT token signing"
-    )
-    algorithm: str = Field(default="HS256",
-                          description="JWT algorithm")
-    access_token_expire_minutes: int = Field(
-        default=1440,
-        description="Access token expiration time in minutes"
-    )
-    refresh_token_expire_days: int = Field(
-        default=7,
-        description="Refresh token expiration time in days"
-    )
+    secret_key: str = Field(..., min_length=32, description="Secret key for JWT token signing")
+    algorithm: str = Field(default="HS256", description="JWT algorithm")
+    access_token_expire_minutes: int = Field(default=30, description="Access token expiration time in minutes")
+    refresh_token_expire_days: int = Field(default=7, description="Refresh token expiration time in days")
 
     # Groq/LLM Configuration
-    groq_api_key: Optional[str] = Field(
-        default=None,
-        description="Groq API key for LLM integration"
-    )
-    llm_model: str = Field(
-        default="mixtral-8x7b-32768",
-        description="LLM model to use"
-    )
-    max_tokens: int = Field(
-        default=1024,
-        description="Maximum tokens for LLM generation"
-    )
+    groq_api_key: str = Field(..., description="Groq API key for LLM integration")
+    llm_model: str = Field(default="llama-3.3-70b-versatile", description="LLM model to use")
+    max_tokens: int = Field(default=1024, description="Maximum tokens for LLM generation")
 
     # CORS Configuration
     cors_origins: list = Field(

@@ -80,7 +80,7 @@ def test_client(test_db):
 def mock_llm_service():
     """Mock LLM service for testing."""
     with patch('src.utils.llm.llm_service') as mock:
-        mock.generate_summary.return_value = "Generated summary"
-        mock.generate_review_summary.return_value = "Generated review summary"
-        mock.generate_recommendations.return_value = "Generated recommendations"
+        mock.generate_summary = AsyncMock(return_value="Generated summary")
+        mock.generate_review_summary = AsyncMock(return_value="Generated review summary")
+        mock.generate_recommendations = AsyncMock(return_value="Generated recommendations")
         yield mock

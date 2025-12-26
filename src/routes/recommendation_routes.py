@@ -39,7 +39,7 @@ async def generate_summary(
         HTTPException: If summary generation fails
     """
     try:
-        summary = llm_service.generate_summary(
+        summary = await llm_service.generate_summary(
             title=request.title,
             author=request.author,
             content=request.content,

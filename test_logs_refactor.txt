@@ -1,0 +1,137 @@
+============================= test session starts ==============================
+platform linux -- Python 3.11.14, pytest-7.4.3, pluggy-1.6.0 -- /usr/local/bin/python3.11
+cachedir: .pytest_cache
+rootdir: /app
+configfile: pytest.ini
+testpaths: tests
+plugins: anyio-3.7.1, asyncio-0.21.1, cov-4.1.0
+asyncio: mode=Mode.AUTO
+collecting ... collected 72 items
+
+tests/integration/test_auth_endpoints.py::test_register_user PASSED      [  1%]
+tests/integration/test_auth_endpoints.py::test_register_duplicate_user PASSED [  2%]
+tests/integration/test_auth_endpoints.py::test_login_success PASSED      [  4%]
+tests/integration/test_auth_endpoints.py::test_login_wrong_password PASSED [  5%]
+tests/integration/test_auth_endpoints.py::test_login_nonexistent_user PASSED [  6%]
+tests/integration/test_auth_endpoints.py::test_get_current_user PASSED   [  8%]
+tests/integration/test_auth_endpoints.py::test_get_current_user_without_auth PASSED [  9%]
+tests/integration/test_auth_endpoints.py::test_get_current_user_with_invalid_token PASSED [ 11%]
+tests/integration/test_book_endpoints.py::test_create_book PASSED        [ 12%]
+tests/integration/test_book_endpoints.py::test_create_book_without_auth PASSED [ 13%]
+tests/integration/test_book_endpoints.py::test_get_all_books PASSED      [ 15%]
+tests/integration/test_book_endpoints.py::test_get_books_with_pagination PASSED [ 16%]
+tests/integration/test_book_endpoints.py::test_get_books_with_genre_filter PASSED [ 18%]
+tests/integration/test_book_endpoints.py::test_get_book_by_id PASSED     [ 19%]
+tests/integration/test_book_endpoints.py::test_get_nonexistent_book PASSED [ 20%]
+tests/integration/test_book_endpoints.py::test_update_book PASSED        [ 22%]
+tests/integration/test_book_endpoints.py::test_delete_book PASSED        [ 23%]
+tests/integration/test_book_endpoints.py::test_search_books PASSED       [ 25%]
+tests/integration/test_recommendation_endpoints.py::test_generate_summary PASSED [ 26%]
+tests/integration/test_recommendation_endpoints.py::test_get_recommendations PASSED [ 27%]
+tests/integration/test_recommendation_endpoints.py::test_get_recommendations_by_genre PASSED [ 29%]
+tests/integration/test_recommendation_endpoints.py::test_get_popular_books PASSED [ 30%]
+tests/integration/test_recommendation_endpoints.py::test_get_similar_books PASSED [ 31%]
+tests/integration/test_recommendation_endpoints.py::test_get_similar_books_nonexistent PASSED [ 33%]
+tests/integration/test_recommendation_endpoints.py::test_endpoints_require_auth PASSED [ 34%]
+tests/integration/test_review_endpoints.py::test_create_review PASSED    [ 36%]
+tests/integration/test_review_endpoints.py::test_create_review_for_nonexistent_book PASSED [ 37%]
+tests/integration/test_review_endpoints.py::test_get_book_reviews PASSED [ 38%]
+tests/integration/test_review_endpoints.py::test_get_book_summary FAILED [ 40%]
+tests/integration/test_review_endpoints.py::test_get_summary_no_reviews PASSED [ 41%]
+tests/integration/test_review_endpoints.py::test_update_review PASSED    [ 43%]
+tests/integration/test_review_endpoints.py::test_delete_review PASSED    [ 44%]
+tests/unit/test_auth.py::test_hash_password PASSED                       [ 45%]
+tests/unit/test_auth.py::test_verify_password_correct PASSED             [ 47%]
+tests/unit/test_auth.py::test_verify_password_incorrect PASSED           [ 48%]
+tests/unit/test_auth.py::test_create_tokens PASSED                       [ 50%]
+tests/unit/test_auth.py::test_verify_token_valid PASSED                  [ 51%]
+tests/unit/test_auth.py::test_verify_token_invalid PASSED                [ 52%]
+tests/unit/test_auth.py::test_verify_token_expired PASSED                [ 54%]
+tests/unit/test_auth.py::test_token_contains_user_info PASSED            [ 55%]
+tests/unit/test_auth.py::test_refresh_token_type PASSED                  [ 56%]
+tests/unit/test_book_service.py::test_create_book PASSED                 [ 58%]
+tests/unit/test_book_service.py::test_get_book_by_id PASSED              [ 59%]
+tests/unit/test_book_service.py::test_get_nonexistent_book PASSED        [ 61%]
+tests/unit/test_book_service.py::test_get_all_books PASSED               [ 62%]
+tests/unit/test_book_service.py::test_get_books_with_genre_filter PASSED [ 63%]
+tests/unit/test_book_service.py::test_get_books_with_author_filter PASSED [ 65%]
+tests/unit/test_book_service.py::test_update_book PASSED                 [ 66%]
+tests/unit/test_book_service.py::test_update_nonexistent_book PASSED     [ 68%]
+tests/unit/test_book_service.py::test_delete_book PASSED                 [ 69%]
+tests/unit/test_book_service.py::test_delete_nonexistent_book PASSED     [ 70%]
+tests/unit/test_book_service.py::test_search_books_by_title PASSED       [ 72%]
+tests/unit/test_book_service.py::test_search_books_by_author PASSED      [ 73%]
+tests/unit/test_review_service.py::test_create_review PASSED             [ 75%]
+tests/unit/test_review_service.py::test_get_review_by_id PASSED          [ 76%]
+tests/unit/test_review_service.py::test_get_reviews_by_book PASSED       [ 77%]
+tests/unit/test_review_service.py::test_get_reviews_by_user PASSED       [ 79%]
+tests/unit/test_review_service.py::test_update_review PASSED             [ 80%]
+tests/unit/test_review_service.py::test_delete_review PASSED             [ 81%]
+tests/unit/test_review_service.py::test_get_book_rating_summary PASSED   [ 83%]
+tests/unit/test_review_service.py::test_get_rating_summary_no_reviews PASSED [ 84%]
+tests/unit/test_user_service.py::test_create_user PASSED                 [ 86%]
+tests/unit/test_user_service.py::test_create_duplicate_user PASSED       [ 87%]
+tests/unit/test_user_service.py::test_get_user_by_id PASSED              [ 88%]
+tests/unit/test_user_service.py::test_get_nonexistent_user PASSED        [ 90%]
+tests/unit/test_user_service.py::test_get_user_by_username PASSED        [ 91%]
+tests/unit/test_user_service.py::test_authenticate_user_success PASSED   [ 93%]
+tests/unit/test_user_service.py::test_authenticate_user_wrong_password PASSED [ 94%]
+tests/unit/test_user_service.py::test_authenticate_nonexistent_user PASSED [ 95%]
+tests/unit/test_user_service.py::test_get_all_users PASSED               [ 97%]
+tests/unit/test_user_service.py::test_delete_user PASSED                 [ 98%]
+tests/unit/test_user_service.py::test_delete_nonexistent_user PASSED     [100%]
+
+=================================== FAILURES ===================================
+____________________________ test_get_book_summary _____________________________
+tests/integration/test_review_endpoints.py:115: in test_get_book_summary
+    assert response.status_code == 200
+E   assert 500 == 200
+E    +  where 500 = <Response [500 Internal Server Error]>.status_code
+---------------------------- Captured stderr setup -----------------------------
+2025-12-26 05:13:36,449 - src.services.book_service - INFO - Book created: Test Book by Test Author
+2025-12-26 05:13:36,611 - src.services.user_service - INFO - User created: testuser
+2025-12-26 05:13:36,763 - src.services.user_service - INFO - User authenticated: testuser
+2025-12-26 05:13:36,764 - httpx - INFO - HTTP Request: POST http://test/auth/login "HTTP/1.1 200 OK"
+------------------------------ Captured log setup ------------------------------
+INFO     src.services.book_service:book_service.py:47 Book created: Test Book by Test Author
+INFO     src.services.user_service:user_service.py:59 User created: testuser
+INFO     src.services.user_service:user_service.py:118 User authenticated: testuser
+INFO     httpx:_client.py:1729 HTTP Request: POST http://test/auth/login "HTTP/1.1 200 OK"
+----------------------------- Captured stderr call -----------------------------
+2025-12-26 05:13:36,774 - src.services.review_service - INFO - Review created for book 1 by user 1
+2025-12-26 05:13:36,774 - src.routes.review_routes - INFO - Review created for book 1 by user 1
+2025-12-26 05:13:36,775 - httpx - INFO - HTTP Request: POST http://test/books/1/reviews "HTTP/1.1 201 Created"
+2025-12-26 05:13:36,784 - src.routes.review_routes - ERROR - Error getting review summary: 1 validation error for ReviewSummaryResponse
+summary
+  Input should be a valid string [type=string_type, input_value=<coroutine object LLMServ...mmary at 0x7f2552623cd0>, input_type=coroutine]
+    For further information visit https://errors.pydantic.dev/2.5/v/string_type
+2025-12-26 05:13:36,784 - httpx - INFO - HTTP Request: GET http://test/books/1/summary "HTTP/1.1 500 Internal Server Error"
+------------------------------ Captured log call -------------------------------
+INFO     src.services.review_service:review_service.py:54 Review created for book 1 by user 1
+INFO     src.routes.review_routes:review_routes.py:57 Review created for book 1 by user 1
+INFO     httpx:_client.py:1729 HTTP Request: POST http://test/books/1/reviews "HTTP/1.1 201 Created"
+ERROR    src.routes.review_routes:review_routes.py:174 Error getting review summary: 1 validation error for ReviewSummaryResponse
+summary
+  Input should be a valid string [type=string_type, input_value=<coroutine object LLMServ...mmary at 0x7f2552623cd0>, input_type=coroutine]
+    For further information visit https://errors.pydantic.dev/2.5/v/string_type
+INFO     httpx:_client.py:1729 HTTP Request: GET http://test/books/1/summary "HTTP/1.1 500 Internal Server Error"
+=============================== warnings summary ===============================
+../usr/local/lib/python3.11/site-packages/pydantic/_internal/_config.py:268
+../usr/local/lib/python3.11/site-packages/pydantic/_internal/_config.py:268
+../usr/local/lib/python3.11/site-packages/pydantic/_internal/_config.py:268
+../usr/local/lib/python3.11/site-packages/pydantic/_internal/_config.py:268
+  /usr/local/lib/python3.11/site-packages/pydantic/_internal/_config.py:268: PydanticDeprecatedSince20: Support for class-based `config` is deprecated, use ConfigDict instead. Deprecated in Pydantic V2.0 to be removed in V3.0. See Pydantic V2 Migration Guide at https://errors.pydantic.dev/2.5/migration/
+    warnings.warn(DEPRECATION_MESSAGE, DeprecationWarning)
+
+src/schemas/__init__.py:25
+  /app/src/schemas/__init__.py:25: PydanticDeprecatedSince20: Pydantic V1 style `@validator` validators are deprecated. You should migrate to Pydantic V2 style `@field_validator` validators, see the migration guide for more details. Deprecated in Pydantic V2.0 to be removed in V3.0. See Pydantic V2 Migration Guide at https://errors.pydantic.dev/2.5/migration/
+    @validator('password')
+
+../usr/local/lib/python3.11/site-packages/passlib/utils/__init__.py:854
+  /usr/local/lib/python3.11/site-packages/passlib/utils/__init__.py:854: DeprecationWarning: 'crypt' is deprecated and slated for removal in Python 3.13
+    from crypt import crypt as _crypt
+
+-- Docs: https://docs.pytest.org/en/stable/how-to/capture-warnings.html
+=========================== short test summary info ============================
+FAILED tests/integration/test_review_endpoints.py::test_get_book_summary - as...
+================== 1 failed, 71 passed, 6 warnings in 12.58s ===================

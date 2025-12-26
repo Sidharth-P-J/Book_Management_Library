@@ -151,7 +151,7 @@ async def get_review_summary(
         summary_text = ""
         if review_texts:
             try:
-                summary_text = llm_service.generate_review_summary(
+                summary_text = await llm_service.generate_review_summary(
                     book.title, review_texts, avg_rating
                 )
             except Exception as e:

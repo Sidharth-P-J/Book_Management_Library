@@ -33,12 +33,12 @@ services:
 
     container_name: book_management_api
     environment:
-      DATABASE_URL: postgresql+asyncpg://postgres:postgres@db:5432/book_management
-      DATABASE_SYNC_URL: postgresql://postgres:postgres@db:5432/book_management
-      DEBUG: "False"
-      SECRET_KEY: your-secret-key-change-in-production-min-32-chars
+      DATABASE_URL: ${DATABASE_URL}
+      DATABASE_SYNC_URL: ${DATABASE_SYNC_URL}
+      DEBUG: ${DEBUG:-False}
+      SECRET_KEY: ${SECRET_KEY}
       GROQ_API_KEY: ${GROQ_API_KEY}
-      LLM_MODEL: qwen/qwen3-32b
+      LLM_MODEL: ${LLM_MODEL:-llama-3.3-70b-versatile}
     ports:
       - "8000:8000"
     depends_on:

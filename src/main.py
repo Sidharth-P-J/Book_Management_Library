@@ -25,6 +25,36 @@ logging.basicConfig(
 )
 logger = logging.getLogger(__name__)
 
+from contextlib import asynccontextmanager
+from fastapi import Request, status
+from fastapi.responses import JSONResponse
+from fastapi.exceptions import RequestValidationError
+
+@asynccontextmanager
+async def lifespan(app: FastAPI):
+    """
+    Lifespan context manager for application startup and shutdown.
+    Handles database initialization and connection cleanup.
+    """
+    # Startup
+    logger.info("Starting up application...")
+    try:
+        await init_db()
+        logger.info("Database initialized successfully")
+    except Exception as e:
+        logger.error(f"Error initializing database: {str(e)}")
+        raise
+    
+    yield
+    
+    # Shutdown
+    logger.info("Shutting down application...")
+    try:
+        await close_db()
+        logger.info("Database connections closed")
+    except Exception as e:
+        logger.error(f"Error closing database: {str(e)}")
+
 # Create FastAPI application
 app = FastAPI(
     title=settings.api_title,
@@ -33,7 +63,28 @@ app = FastAPI(
     docs_url="/api/docs",
     redoc_url="/api/redoc",
     openapi_url="/api/openapi.json",
+    lifespan=lifespan
 )
+
+# ==================== Exception Handlers ====================
+
+@app.exception_handler(RequestValidationError)
+async def validation_exception_handler(request: Request, exc: RequestValidationError):
+    """Global handler for validation errors."""
+    logger.error(f"Validation error: {exc.errors()}")
+    return JSONResponse(
+        status_code=status.HTTP_422_UNPROCESSABLE_ENTITY,
+        content={"detail": exc.errors(), "message": "Validation error"},
+    )
+
+@app.exception_handler(Exception)
+async def global_exception_handler(request: Request, exc: Exception):
+    """Global handler for unhandled exceptions."""
+    logger.error(f"Unhandled exception: {str(exc)}", exc_info=True)
+    return JSONResponse(
+        status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+        content={"detail": "Internal server error", "message": "An unexpected error occurred."},
+    )
 
 # Configure CORS
 app.add_middleware(
@@ -43,31 +94,6 @@ app.add_middleware(
     allow_methods=["*"],
     allow_headers=["*"],
 )
-
-
-# ==================== Event Handlers ====================
-
-@app.on_event("startup")
-async def startup_event():
-    """Initialize database on application startup."""
-    logger.info("Starting up application...")
-    try:
-        await init_db()
-        logger.info("Database initialized successfully")
-    except Exception as e:
-        logger.error(f"Error initializing database: {str(e)}")
-        raise
-
-
-@app.on_event("shutdown")
-async def shutdown_event():
-    """Close database connections on application shutdown."""
-    logger.info("Shutting down application...")
-    try:
-        await close_db()
-        logger.info("Database connections closed")
-    except Exception as e:
-        logger.error(f"Error closing database: {str(e)}")
 
 
 # ==================== Health Check ====================

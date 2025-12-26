@@ -182,7 +182,7 @@ REFRESH_TOKEN_EXPIRE_DAYS=7
 
 # LLM (Groq)
 GROQ_API_KEY=your-groq-api-key
-LLM_MODEL=mixtral-8x7b-32768
+LLM_MODEL=llama-3.3-70b-versatile
 MAX_TOKENS=1024
 
 # CORS
@@ -194,9 +194,9 @@ CORS_ORIGINS=["http://localhost:3000", "http://localhost:8000"]
 - **SECRET_KEY**: Must be at least 32 characters in production
 - **GROQ_API_KEY**: Obtain from [Groq Console](https://console.groq.com)
 - **LLM_MODEL**: Available models include:
-  - mixtral-8x7b-32768
-  - llama2-70b-4096
-  - Any other Groq-supported model
+  - llama-3.3-70b-versatile (Recommended)
+  - llama-3.1-70b-versatile
+  - llama3-70b-8192
 
 ## Running the Application
 

@@ -1,13 +1,8 @@
-"""
-LLM and AI integration utilities.
-
-This module provides integration with Groq API for accessing Llama3
-and other open-source models for generating summaries and recommendations.
-"""
-
 import logging
-from typing import Optional
+import asyncio
+from typing import Optional, List, Dict, Any
 from groq import Groq
+from functools import partial
 
 from src.core.config import settings
 
@@ -17,20 +12,26 @@ logger = logging.getLogger(__name__)
 class LLMService:
     """
     Service for interacting with LLM models via Groq API.
-
-    Uses Groq's API to access Llama3 and other open-source models
-    for generating summaries and recommendations.
+    
+    Provides async wrappers around the synchronous Groq client to ensure
+    non-blocking operation within the FastAPI event loop.
     """
 
     def __init__(self):
         """Initialize LLM service with Groq client."""
+        # Check if API key is configured (it's mandatory now but good to check)
         if not settings.groq_api_key:
             logger.warning("Groq API key not configured. LLM features will be disabled.")
             self.client = None
         else:
             self.client = Groq(api_key=settings.groq_api_key)
 
-    def generate_summary(
+    async def _run_in_thread(self, func, *args, **kwargs):
+        """Run a blocking function in a separate thread."""
+        loop = asyncio.get_running_loop()
+        return await loop.run_in_executor(None, partial(func, *args, **kwargs))
+
+    async def generate_summary(
         self,
         title: str,
         author: str,
@@ -38,22 +39,19 @@ class LLMService:
         max_tokens: Optional[int] = None
     ) -> str:
         """
-        Generate a summary for book content.
+        Generate a summary for book content asynchronously.
 
         Args:
             title: Book title
             author: Book author
-            content: Book content or description
-            max_tokens: Maximum tokens in response (default from config)
+            content: Book content
+            max_tokens: Max tokens (optional)
 
         Returns:
-            Generated summary string
-
-        Raises:
-            RuntimeError: If LLM service is not configured
+            Generated summary
         """
         if not self.client:
-            raise RuntimeError("LLM service not configured. Please set GROQ_API_KEY environment variable.")
+            raise RuntimeError("LLM service not configured.")
 
         max_tokens = max_tokens or settings.max_tokens
 
@@ -71,51 +69,36 @@ class LLMService:
         """
 
         try:
-            message = self.client.chat.completions.create(
+            # Run blocking API call in thread pool
+            chat_completion = await self._run_in_thread(
+                self.client.chat.completions.create,
                 messages=[
-                    {
-                        "role": "user",
-                        "content": prompt.strip()
-                    }
+                    {"role": "user", "content": prompt.strip()}
                 ],
                 model=settings.llm_model,
                 max_tokens=max_tokens,
                 temperature=0.7,
             )
-            return message.choices[0].message.content.strip()
+            return chat_completion.choices[0].message.content.strip()
         except Exception as e:
-            logger.error(f"Error generating summary: {str(e)}")
+            logger.error(f"Error generating summary: {str(e)}", exc_info=True)
             raise RuntimeError(f"Failed to generate summary: {str(e)}") from e
 
-    def generate_review_summary(
+    async def generate_review_summary(
         self,
         book_title: str,
         reviews: list,
         average_rating: float,
         max_tokens: Optional[int] = None
     ) -> str:
-        """
-        Generate a summary of reviews for a book.
-
-        Args:
-            book_title: Title of the book
-            reviews: List of review texts
-            average_rating: Average rating of the book
-            max_tokens: Maximum tokens in response
-
-        Returns:
-            Generated review summary
-
-        Raises:
-            RuntimeError: If LLM service is not configured
-        """
+        """Generate review summary asynchronously."""
         if not self.client:
-            raise RuntimeError("LLM service not configured. Please set GROQ_API_KEY environment variable.")
+            raise RuntimeError("LLM service not configured.")
 
         max_tokens = max_tokens or settings.max_tokens
-
-        # Prepare review text
-        reviews_text = "\n".join([f"- {review}" for review in reviews[:5]])  # Use first 5 reviews
+        
+        # Limit reviews to avoid token limits
+        reviews_text = "\n".join([f"- {r}" for r in reviews[:10]])
 
         prompt = f"""
         Summarize the following reviews for the book "{book_title}".
@@ -129,52 +112,37 @@ class LLMService:
         """
 
         try:
-            message = self.client.chat.completions.create(
+            chat_completion = await self._run_in_thread(
+                self.client.chat.completions.create,
                 messages=[
-                    {
-                        "role": "user",
-                        "content": prompt.strip()
-                    }
+                    {"role": "user", "content": prompt.strip()}
                 ],
                 model=settings.llm_model,
                 max_tokens=max_tokens,
                 temperature=0.7,
             )
-            return message.choices[0].message.content.strip()
+            return chat_completion.choices[0].message.content.strip()
         except Exception as e:
-            logger.error(f"Error generating review summary: {str(e)}")
+            logger.error(f"Error generating review summary: {str(e)}", exc_info=True)
             raise RuntimeError(f"Failed to generate review summary: {str(e)}") from e
 
-    def generate_recommendations(
+    async def generate_recommendations(
         self,
         user_preferences: str,
         available_books: list,
         limit: int = 5,
         max_tokens: Optional[int] = None
     ) -> str:
-        """
-        Generate book recommendations based on user preferences.
-
-        Args:
-            user_preferences: Description of user preferences
-            available_books: List of available books with metadata
-            limit: Number of recommendations to generate
-            max_tokens: Maximum tokens in response
-
-        Returns:
-            Generated recommendations
-
-        Raises:
-            RuntimeError: If LLM service is not configured
-        """
+        """Generate recommendations asynchronously."""
         if not self.client:
-            raise RuntimeError("LLM service not configured. Please set GROQ_API_KEY environment variable.")
+            raise RuntimeError("LLM service not configured.")
 
         max_tokens = max_tokens or settings.max_tokens
 
+        # Format books compactly
         books_text = "\n".join([
-            f"- {book.get('title', 'Unknown')} by {book.get('author', 'Unknown')} (Genre: {book.get('genre', 'Unknown')})"
-            for book in available_books[:20]
+            f"- ID:{b.get('id')} Title:{b.get('title')} Genre:{b.get('genre')}"
+            for b in available_books[:30]  # Limit context
         ])
 
         prompt = f"""
@@ -191,20 +159,18 @@ class LLMService:
         """
 
         try:
-            message = self.client.chat.completions.create(
+            chat_completion = await self._run_in_thread(
+                self.client.chat.completions.create,
                 messages=[
-                    {
-                        "role": "user",
-                        "content": prompt.strip()
-                    }
+                    {"role": "user", "content": prompt.strip()}
                 ],
                 model=settings.llm_model,
                 max_tokens=max_tokens,
                 temperature=0.7,
             )
-            return message.choices[0].message.content.strip()
+            return chat_completion.choices[0].message.content.strip()
         except Exception as e:
-            logger.error(f"Error generating recommendations: {str(e)}")
+            logger.error(f"Error generating recommendations: {str(e)}", exc_info=True)
             raise RuntimeError(f"Failed to generate recommendations: {str(e)}") from e
 
 

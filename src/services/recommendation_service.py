@@ -156,7 +156,7 @@ class RecommendationService:
             ]
 
             # Generate recommendations using LLM
-            reasoning = llm_service.generate_recommendations(
+            reasoning = await llm_service.generate_recommendations(
                 user_preferences, books_data, limit
             )
 
